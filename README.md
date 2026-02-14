@@ -3,7 +3,7 @@
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.7+-blue.svg)
 
-![GitHub Repo](https://github.com/alver/memory-ball-video)
+[GitHub Repo](https://github.com/alver/memory-ball-video)
 
 **Keywords:** memory ball video, electronic ball, magic crystal ball, crystal ball display, video electronic ball, video crystal ball, UM-ER-02, photo slideshow maker, ffmpeg video transitions, free video maker, photo to video converter, slideshow with music, 480x480 video, memory ball software alternative, create video from photos, ffmpeg slideshow, python video maker, photo video editor free, xfade transitions, memory sphere video
 
