@@ -3,9 +3,9 @@
 Memory Ball Video Maker
 Creates videos with transitions from photos for Memory Ball (Electronic Ball UM-ER-02)
 
-Author: Alver
+Author: alver
 License: MIT
-Repository: https://github.com/alver/memory-ball-video-maker
+Repository: https://github.com/alver/memory-ball-video
 """
 
 import os
