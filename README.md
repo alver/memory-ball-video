@@ -5,347 +5,226 @@
 
 [GitHub Repo](https://github.com/alver/memory-ball-video)
 
-**Keywords:** memory ball video, electronic ball, magic crystal ball, crystal ball display, video electronic ball, video crystal ball, UM-ER-02, photo slideshow maker, ffmpeg video transitions, free video maker, photo to video converter, slideshow with music, 480x480 video, memory ball software alternative, create video from photos, ffmpeg slideshow, python video maker, photo video editor free, xfade transitions, memory sphere video
+**Keywords:** memory ball video, electronic ball, magic crystal ball, crystal ball display, video electronic ball, video crystal ball, UM-ER-02, photo slideshow maker, ffmpeg video transitions, free video maker, photo to video converter, slideshow with music, 480x480 video, memory ball software alternative, create video from photos, ffmpeg slideshow, python video maker, photo video editor free, xfade transitions, memory sphere video, memory orb video, dream sphere ball, crystal ball video player, 3D crystal ball, memory sphere lamp, electronic crystal ball
 
-[Русская версия / Russian Version](README.ru.md)
-
----
-
-## 🎯 About This Project
-
-This is a **free, open-source alternative** to paid software for creating videos from photos for Memory Ball.
-
-## The Core Idea: FFmpeg Can Do It All
-
-**You don't actually need this specific script!** The key insight is that **FFmpeg** - a free, powerful multimedia tool - can create professional videos with transitions from your photos. This script is just **one example** of how to automate the process.
-
-### Why This Matters
-
-- **Memory Ball manufacturers** suggest to use paid software for creating 480x480 videos
-- **FFmpeg is free** and can do everything their paid software does
-- **Modern AI assistants** (like Claude, ChatGPT, etc.) can write custom scripts for your specific needs in minutes
-- **You have full control** - modify, adapt, or completely rewrite for your use case
-
-### How to Approach This Task
-
-1. **Use FFmpeg directly** - Learn FFmpeg commands and create videos manually
-2. **Use this script** - A ready-made Python solution for common scenarios
-3. **Ask an AI to write custom code** - Get a script tailored to your exact requirements
-4. **Modify this script** - Adapt it to your specific workflow
-
-**Bottom line:** Don't feel locked into paid software. FFmpeg + a bit of scripting (or AI help) gives you unlimited freedom!
+[Русская версия / Russian Version](/memory-ball-video/README.ru.html)
 
 ---
 
-## ⚠️ Important: Photo Preparation Required
+## What is Memory Ball?
 
-**Before using the script, you must prepare your photos:**
+Memory Ball (also sold as Memory Orb, Memory Sphere, Dream Sphere, Crystal Ball Video Player, and under model names like UM-ER-02) is a small spherical device with a built-in screen that plays videos. It has become a popular personalized gift — people load them with family photos, ultrasound images, wedding memories, or any other meaningful content.
 
-### Photo Requirements
-- **Exact size: 480×480 pixels**
-- **Aspect ratio: 1:1 (square)**
-- The script does **NOT** crop or resize photos automatically (yet)
+The sphere is typically about 2.7 inches (70mm) in diameter, has a built-in rechargeable battery (2–4 hours of playback), 4GB of internal storage, and a round LCD display with **480×480 pixel resolution**. You load content onto it via USB-C cable or, in newer WiFi models, wirelessly through an app. The device plays MP4 videos and shows JPG images from the memory card.
 
-### Why This Matters
-Memory Ball requires exactly 480×480 pixel videos. If your photos are not square (480×480), the script will:
-- Scale them to fit 480×480 (may add black bars)
-- Potentially distort the image
-- Not give optimal results
+The catch? There are two:
+1. The ball do not play the images from the separate folder, and I didn't find any instruction how to make this work. So, photos and images needs to be cnverted to video.
+2. Most manufacturers suggest **paid proprietary software** for creating videos. Some versions come with a "free" app that works, but it's limited and often poorly made.
 
-### How to Prepare Photos
+**You don't need their software.** Everything it does — and much more — can be done for free with **FFmpeg**.
 
-**Option 1: Use Image Editing Software**
-- Photoshop, GIMP, or any image editor
-- Crop each photo to square (1:1 ratio)
-- Resize to exactly 480×480 pixels
-- Save as JPG or PNG
+---
 
-**Option 2: Batch Processing Tools**
-- **Windows:** IrfanView (free), XnConvert
-- **macOS:** Preview (built-in), Automator
-- **Linux:** ImageMagick, GIMP batch mode
+## FFmpeg: the tool that does everything with video
 
-**Option 3: ImageMagick Command Line**
+[FFmpeg](https://ffmpeg.org/) is a free, open-source command-line tool for working with video, audio, and images. It has been around since 2000, it is used by huge companies (YouTube, Netflix, VLC, even NASA's Perseverance rover on Mars), and it can handle practically any multimedia task you can imagine.
+
+Here's what matters for us: **FFmpeg can do anything you'd ever want to do to prepare video for Memory Ball, and it does it for free.**
+
+### What FFmpeg can do (examples)
+
+**Convert video format and resolution.** Have an MP4 in 1080p? Convert it to 480×480 in one command:
+
 ```bash
-# Crop to square (center) and resize to 480x480
-magick convert input.jpg -resize 480x480^ -gravity center -extent 480x480 output.jpg
-
-# Batch process all photos in folder
-for img in *.jpg; do magick convert "$img" -resize 480x480^ -gravity center -extent 480x480 "processed_$img"; done
+ffmpeg -i input.mp4 -vf "scale=480:480" -c:v libx264 output.mp4
 ```
 
-### Best Practice
-1. Create a folder `photos_original/` with your original photos
-2. Process and crop all photos to 480×480
-3. Save processed photos to `photos/` folder
-4. Run the script on the `photos/` folder
+**Create a video from photos.** Have a folder of JPGs? Turn them into a slideshow:
+
+```bash
+ffmpeg -framerate 1/5 -pattern_type glob -i '*.jpg' -vf "scale=480:480" -c:v libx264 -pix_fmt yuv420p slideshow.mp4
+```
+
+This shows each photo for 5 seconds. Change `1/5` to `1/3` for 3 seconds, `1/10` for 10, and so on.
+
+**Add transitions between photos.** FFmpeg supports dozens of transition effects (crossfade, dissolve, wipe, slide, circle reveal, and more) through its `xfade` filter. This is exactly what the paid Memory Ball software does — but FFmpeg does it better and with more options.
+
+**Add music to a video.** Overlay an audio track on your slideshow:
+
+```bash
+ffmpeg -i video.mp4 -i music.mp3 -c:v copy -c:a aac -shortest output.mp4
+```
+
+**Loop music to match video length:**
+
+```bash
+ffmpeg -i video.mp4 -stream_loop -1 -i music.mp3 -c:v copy -c:a aac -shortest output.mp4
+```
+
+**Crop, pad, or resize any video.** Square crop from the center:
+
+```bash
+ffmpeg -i input.mp4 -vf "crop=min(iw\,ih):min(iw\,ih),scale=480:480" output.mp4
+```
+
+Add black bars to fit without cropping:
+
+```bash
+ffmpeg -i input.mp4 -vf "scale=480:480:force_original_aspect_ratio=decrease,pad=480:480:(ow-iw)/2:(oh-ih)/2" output.mp4
+```
+
+**Trim a video.** Cut out a specific segment:
+
+```bash
+ffmpeg -i input.mp4 -ss 00:00:30 -t 00:01:00 -c copy clip.mp4
+```
+
+**Create collages and picture-in-picture.** Combine multiple videos into one frame:
+
+```bash
+ffmpeg -i video1.mp4 -i video2.mp4 -filter_complex "[0:v]scale=240:240[left];[1:v]scale=240:240[right];[left][right]hstack" collage.mp4
+```
+
+**Extract frames from video.** Pull out individual images:
+
+```bash
+ffmpeg -i video.mp4 -vf "fps=1" frame_%04d.jpg
+```
+
+**Convert between any formats.** MP4, AVI, MOV, MKV, WebM, GIF — FFmpeg handles them all. It supports virtually every video and audio codec in existence.
+
+### The point
+
+FFmpeg is an incredibly powerful and flexible tool. The paid software that comes with Memory Ball does one simple thing: it creates a slideshow from photos with some transitions. FFmpeg can do that and a thousand other things.
+
+You can learn FFmpeg commands yourself, or — even easier — **ask any modern AI assistant** (Claude, ChatGPT, etc.) to write you an FFmpeg command or script for exactly what you need. Describe what you want in plain language, and you'll get a working command in seconds.
 
 ---
 
-## ✨ What This Script Does
+## Script in repo: a ready-made example
 
-Create beautiful videos with transitions from your photos for **Memory Ball (Electronic Ball UM-ER-02)** - completely **FREE** and **open-source**!
+As a practical example, I've written a Python script that automates one of the most common tasks: creating a video slideshow from photos with random transitions and optional background music. It's designed specifically for Memory Ball's 480×480 format, but it can be adapted for anything.
 
-## 🤖 Want a Custom Solution?
+You can use this script as-is, modify it, or just use it as inspiration to write your own. The script is available at [GitHub](https://github.com/alver/memory-ball-video).
 
-**This script is just one example!** Modern AI assistants can create custom scripts for your specific needs:
+### What the script does
 
-- Different video sizes or formats
-- Custom transition patterns
-- Specific timing requirements
-- Integration with your existing workflow
-- Additional effects or features
+- Takes a folder of photos and creates an MP4 video with transitions
+- Randomly selects from 16 different transition effects (fade, dissolve, wipe, slide, circle, smooth, and more)
+- Optionally adds background music that loops to match video length
+- Lets you specify which photos appear first (the rest are randomized)
+- Outputs 480×480 MP4 ready for Memory Ball
+- Automatically handles photos of any size — crops, pads, or blurs to fit (configurable)
 
-**Try asking an AI assistant:**
-> "Write me a Python script using FFmpeg to create a video from photos with crossfade transitions, 720p resolution, and background music that loops."
+### Requirements
 
-Most modern LLMs (Claude, ChatGPT, etc.) can write working code in minutes. **You're not limited to this script - you have the power to create exactly what you need!**
+You need **Python 3.7+** and **FFmpeg** installed:
 
----
+- **Windows:** Download Python from [python.org](https://www.python.org/downloads/), FFmpeg from [ffmpeg.org](https://ffmpeg.org/download.html) (add to PATH)
+- **macOS:** `brew install python3 ffmpeg`
+- **Linux:** `sudo apt install python3 ffmpeg`
 
-Memory Ball (Electronic Ball UM-ER-02) is a spherical device that displays photos and videos. It requires videos in a specific format: **480x480 pixels, MP4 format**.
-
-## ✨ Features
-
-- ✅ **Random transitions** - 16 different transition effects between photos
-- ✅ **Background music** - Add looping music from MP3/M4A/WAV files
-- ✅ **Custom photo order** - Specify which photos to show first, rest are randomized
-- ✅ **Correct format** - Automatically creates 480x480 videos for Memory Ball
-- ✅ **Free & Open Source** - No paid software needed!
-- ✅ **Handles large batches** - Works with hundreds of photos
-
-## 📋 Requirements
-
-### Required Software
-
-1. **Python 3.7+**
-   - Windows: Download from [python.org](https://www.python.org/downloads/)
-   - macOS: `brew install python3`
-   - Linux: `sudo apt install python3`
-
-2. **FFmpeg**
-   - Windows: Download from [ffmpeg.org](https://ffmpeg.org/download.html) and add to PATH
-   - macOS: `brew install ffmpeg`
-   - Linux: `sudo apt install ffmpeg`
-
-### Verify Installation
+Verify both are working:
 
 ```bash
 python --version
 ffmpeg -version
 ```
 
-## 🚀 Quick Start
+### Quick start
 
-### 1. Download the Script
+1. Download `create_video.py` from the [repository](https://github.com/alver/memory-ball-video)
+2. Put your photos in a `photos/` folder
+3. Run:
 
-```bash
-git clone https://github.com/YOUR_USERNAME/memory-ball-video-maker.git
-cd memory-ball-video-maker
-```
-
-Or download `create_video.py` directly.
-
-### 2. Prepare Your Files
-
-```
-my-project/
-├── photos/          # Your photos here (JPG, PNG)
-│   ├── IMG_001.jpg
-│   ├── IMG_002.jpg
-│   └── ...
-├── music/           # Your music here (MP3, M4A, WAV) [optional]
-│   ├── track1.mp3
-│   └── track2.mp3
-└── create_video.py  # The script
-```
-
-### 3. Run the Script
-
-**Basic usage (random order):**
 ```bash
 python create_video.py ./photos
 ```
 
-**With custom settings:**
-```bash
-python create_video.py ./photos output.mp4 5 1
-```
-- `5` = seconds per photo
-- `1` = transition duration
+That's it. You'll get `output.mp4` ready for your Memory Ball.
 
-**With music:**
+### More options
+
 ```bash
+# Custom filename, 7 seconds per photo, 1.5 second transitions
+python create_video.py ./photos my_video.mp4 7 1.5
+
+# Add background music
 python create_video.py ./photos output.mp4 5 1 --music ./music
-```
 
-**With specific photos first:**
-```bash
-python create_video.py ./photos output.mp4 5 1 --first IMG_001.jpg IMG_002.jpg IMG_003.jpg
-```
+# Show specific photos first, then randomize the rest
+python create_video.py ./photos output.mp4 5 1 --first favorite1.jpg favorite2.jpg
 
-**Full example (music + fixed order):**
-```bash
-python create_video.py ./photos my_video.mp4 5 1 --music ./music --first favorite1.jpg favorite2.jpg
-```
+# Choose how non-square photos are handled: crop (default), pad, blur, or stretch
+python create_video.py ./photos output.mp4 5 1 --mode blur
 
-## 📖 Usage
-
-### Command Syntax
-
-```bash
-python create_video.py <photo_folder> [output_file] [duration] [transition] [options]
+# Everything together
+python create_video.py ./photos memory_ball.mp4 6 1 --music ./music --first cover.jpg intro.jpg --mode blur
 ```
 
 ### Parameters
 
-| Parameter | Description | Default | Example |
-|-----------|-------------|---------|---------|
-| `photo_folder` | Path to folder with photos | Required | `./photos` |
-| `output_file` | Output video filename | `output.mp4` | `my_video.mp4` |
-| `duration` | Seconds per photo | `5` | `7` |
-| `transition` | Transition duration (seconds) | `1` | `1.5` |
+| Parameter | What it does | Default |
+|-----------|-------------|---------|
+| `photo_folder` | Folder with your photos | Required |
+| `output_file` | Output filename | `output.mp4` |
+| `duration` | Seconds per photo | `5` |
+| `transition` | Transition duration in seconds | `1` |
+| `--music <folder>` | Folder with music files (MP3, M4A, WAV) | None |
+| `--first <files>` | Photos to show first (in order) | None |
+| `--mode` | How to handle non-square photos: `crop`, `pad`, `blur`, `stretch` | `crop` |
 
-### Options
+### Available transitions
 
-| Option | Description | Example |
-|--------|-------------|---------|
-| `--music <folder>` | Add background music from folder | `--music ./music` |
-| `--first <files...>` | Show specific photos first (in order) | `--first photo1.jpg photo2.jpg` |
+The script randomly picks from: `fade`, `dissolve`, `wipeleft`, `wiperight`, `wipeup`, `wipedown`, `slideleft`, `slideright`, `slideup`, `slidedown`, `circleopen`, `circleclose`, `smoothleft`, `smoothright`, `smoothup`, `smoothdown`, `fadeblack`.
 
-### Examples
+### Photo scaling modes
 
-**1. Simple video (all random):**
-```bash
-python create_video.py ./photos
+- **crop** (default) — Crops to square from center. No black bars, but edges may be cut off.
+- **pad** — Adds black bars to fit the full image. Shows everything, but with letterboxing.
+- **blur** — Uses a blurred version of the photo as background with the original centered on top. Artistic effect, no bars.
+- **stretch** — Stretches to 480×480. Distorts the image, not recommended.
+
+### Folder structure
+
 ```
-
-**2. Longer display time:**
-```bash
-python create_video.py ./photos video.mp4 10 1.5
+my-project/
+├── photos/           # Your photos (JPG, PNG, BMP)
+├── music/            # Music files (optional)
+└── create_video.py   # The script
 ```
-Each photo shows for 10 seconds, transitions last 1.5 seconds
-
-**3. With background music:**
-```bash
-python create_video.py ./photos video.mp4 5 1 --music ./my_music
-```
-Music loops automatically to match video length
-
-**4. Important photos first, then random:**
-```bash
-python create_video.py ./photos video.mp4 5 1 --first wedding_001.jpg wedding_002.jpg wedding_005.jpg
-```
-
-**5. Complete setup:**
-```bash
-python create_video.py ./photos memory_ball.mp4 6 1 --music ./music --first cover.jpg intro.jpg
-```
-
-## 🎨 Available Transitions
-
-The script randomly selects from 16 different transitions:
-
-- `fade` - Classic crossfade
-- `dissolve` - Dissolve effect
-- `wipeleft/right/up/down` - Wipe transitions
-- `slideleft/right/up/down` - Slide transitions
-- `circleopen/close` - Circular reveal/hide
-- `smoothleft/right/up/down` - Smooth slide
-- `fadeblack` - Fade through black
-
-Each transition is randomly chosen between photos for variety!
-
-## 🎵 Music Support
-
-- **Formats**: MP3, M4A, WAV, AAC
-- **Looping**: Music automatically loops to match video length
-- **Multiple tracks**: Place multiple files in music folder - they play in sequence then loop
-
-**Music folder example:**
-```
-music/
-├── song1.mp3
-├── song2.mp3
-└── song3.m4a
-```
-
-Playback order: song1 → song2 → song3 → song1 → song2 → ...
-
-## 💡 Tips
-
-1. **Photo quality**: Use 480x480 or larger photos for best quality
-2. **Many photos**: Script handles 200+ photos without issues
-3. **Processing time**: Depends on number of photos (1-5 minutes for 100 photos)
-4. **Music length**: Can be shorter than video - it will loop automatically
-5. **Testing**: Try with a few photos first to check timing
-
-## 🐛 Troubleshooting
-
-**"FFmpeg not found"**
-- Make sure FFmpeg is installed and added to system PATH
-- Test with: `ffmpeg -version`
-
-**"No images found"**
-- Check that photos are in correct folder
-- Supported: `.jpg`, `.jpeg`, `.png`, `.bmp`
-
-**Video too short/long**
-- Adjust `duration` parameter (seconds per photo)
-- Formula: `total_time = number_of_photos × duration`
-
-**"File not found" for --first**
-- Make sure filenames are exact (case-sensitive on Linux/Mac)
-- Use relative path or just filename if in photos folder
-
-## 🔧 Technical Details
-
-- **Output format**: MP4 (H.264 video, AAC audio)
-- **Resolution**: 480x480 pixels (Memory Ball requirement)
-- **Frame rate**: 30 fps
-- **Audio bitrate**: 192 kbps
-- **Processing**: Creates intermediate clips then merges with transitions
-
-## 📝 License
-
-MIT License - feel free to use, modify, and distribute!
-
-## 🤝 Contributing
-
-Contributions welcome! Feel free to:
-- Report bugs
-- Suggest features
-- Submit pull requests
-- Improve documentation
-
-## 🙏 Acknowledgments
-
-This project was created to provide a free alternative to paid Memory Ball software. 
-
-**Special thanks to:**
-- The open-source community
-- FFmpeg developers for creating such a powerful tool
-- Modern AI assistants that make coding accessible to everyone
-- Everyone who contributes to making technology free and open
-
-**Remember:** This is just one way to solve the problem. FFmpeg is incredibly powerful, and with a bit of help (human or AI), you can create any video workflow you need!
 
 ---
 
-## 💭 Philosophy
+## Troubleshooting
 
-We believe that:
-- **Knowledge should be free** - No one should pay for basic video creation
-- **Tools should be accessible** - FFmpeg is free and powerful
-- **AI can help everyone** - Modern LLMs democratize coding
-- **Open source wins** - Share solutions, help others
+**"FFmpeg not found"** — Make sure FFmpeg is installed and in your system PATH. Test with `ffmpeg -version`.
 
-**Don't just use this script - understand the approach, adapt it, improve it, or create your own!**
+**"No images found"** — Check that your photos are in the right folder and are `.jpg`, `.jpeg`, `.png`, or `.bmp`.
+
+**Video is too short or too long** — Adjust the `duration` parameter. Total time = number of photos × duration.
+
+**Processing takes a long time** — This is normal for hundreds of photos. For 100 photos it typically takes 1–5 minutes. The script processes in batches.
 
 ---
 
-## 📞 Support
+## Technical details
 
-If you find this useful, please ⭐ star the repository!
+- Output: MP4 (H.264 video, AAC audio)
+- Resolution: 480×480
+- Frame rate: 30 fps
+- Audio: 192 kbps
 
-For issues or questions, please open a GitHub issue.
+---
+
+## License
+
+MIT — use, modify, and distribute freely.
+
+---
+
+## The bigger picture
+
+I believe you shouldn't have to pay for basic video creation. FFmpeg is free, powerful, and can do everything the paid Memory Ball software does — and much more. Modern AI assistants make it easy for anyone to write custom scripts and commands. This project is just one example of what's possible.
+
+Don't just use this script — understand the approach. FFmpeg is the real tool. Learn it, ask AI to help you with it, or write your own scripts. You have full control.
