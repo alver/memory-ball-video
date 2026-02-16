@@ -138,7 +138,7 @@ ffmpeg -version
 3. Run:
 
 ```bash
-python create_video.py ./photos
+python create_video.py --photos ./photos
 ```
 
 That's it. You'll get `output.mp4` ready for your Memory Ball.
@@ -147,32 +147,32 @@ That's it. You'll get `output.mp4` ready for your Memory Ball.
 
 ```bash
 # Custom filename, 7 seconds per photo, 1.5 second transitions
-python create_video.py ./photos my_video.mp4 7 1.5
+python create_video.py --photos ./photos --output my_video.mp4 --duration 7 --transition 1.5
 
 # Add background music
-python create_video.py ./photos output.mp4 5 1 --music ./music
+python create_video.py --photos ./photos --music ./music
 
 # Show specific photos first, then randomize the rest
-python create_video.py ./photos output.mp4 5 1 --first favorite1.jpg favorite2.jpg
+python create_video.py --photos ./photos --first favorite1.jpg favorite2.jpg
 
 # Choose how non-square photos are handled: crop (default), pad, blur, or stretch
-python create_video.py ./photos output.mp4 5 1 --mode blur
+python create_video.py --photos ./photos --mode blur
 
 # Everything together
-python create_video.py ./photos memory_ball.mp4 6 1 --music ./music --first cover.jpg intro.jpg --mode blur
+python create_video.py --photos ./photos --output memory_ball.mp4 --duration 6 --transition 1 --music ./music --first cover.jpg intro.jpg --mode blur
 ```
 
 ### Parameters
 
 | Parameter | What it does | Default |
 |-----------|-------------|---------|
-| `photo_folder` | Folder with your photos | Required |
-| `output_file` | Output filename | `output.mp4` |
-| `duration` | Seconds per photo | `5` |
-| `transition` | Transition duration in seconds | `1` |
+| `--photos <folder>` | Folder with your photos | Required |
+| `--output <file>` | Output filename | `output.mp4` |
+| `--duration <seconds>` | Seconds per photo | `5` |
+| `--transition <seconds>` | Transition duration in seconds | `1` |
 | `--music <folder>` | Folder with music files (MP3, M4A, WAV) | None |
-| `--first <files>` | Photos to show first (in order) | None |
-| `--mode` | How to handle non-square photos: `crop`, `pad`, `blur`, `stretch` | `crop` |
+| `--first <files...>` | Photos to show first (in order) | None |
+| `--mode <mode>` | How to handle non-square photos: `crop`, `pad`, `blur`, `stretch` | `crop` |
 
 ### Available transitions
 

@@ -138,7 +138,7 @@ ffmpeg -version
 3. Запустите:
 
 ```bash
-python create_video.py ./photos
+python create_video.py --photos ./photos
 ```
 
 Всё. Получите `output.mp4`, готовый для вашего Memory Ball.
@@ -147,32 +147,32 @@ python create_video.py ./photos
 
 ```bash
 # Своё имя файла, 7 секунд на фото, переходы по 1.5 секунды
-python create_video.py ./photos my_video.mp4 7 1.5
+python create_video.py --photos ./photos --output my_video.mp4 --duration 7 --transition 1.5
 
 # Добавить фоновую музыку
-python create_video.py ./photos output.mp4 5 1 --music ./music
+python create_video.py --photos ./photos --music ./music
 
 # Показать конкретные фото первыми, остальные — в случайном порядке
-python create_video.py ./photos output.mp4 5 1 --first favorite1.jpg favorite2.jpg
+python create_video.py --photos ./photos --first favorite1.jpg favorite2.jpg
 
 # Выбрать режим обработки неквадратных фото: crop (по умолчанию), pad, blur или stretch
-python create_video.py ./photos output.mp4 5 1 --mode blur
+python create_video.py --photos ./photos --mode blur
 
 # Всё вместе
-python create_video.py ./photos memory_ball.mp4 6 1 --music ./music --first cover.jpg intro.jpg --mode blur
+python create_video.py --photos ./photos --duration 5 --transition 1 --music ./music --first cover.jpg intro.jpg --mode blur --output memory_ball.mp4
 ```
 
 ### Параметры
 
 | Параметр | Что делает | По умолчанию |
 |----------|-----------|--------------|
-| `photo_folder` | Папка с фотографиями | Обязательный |
-| `output_file` | Имя выходного файла | `output.mp4` |
-| `duration` | Секунд на фото | `5` |
-| `transition` | Длительность перехода в секундах | `1` |
+| `--photos <folder>` | Папка с фотографиями | Обязательный |
+| `--output <file>` | Имя выходного файла | `output.mp4` |
+| `--duration <seconds>` | Секунд на фото | `5` |
+| `--transition <seconds>` | Длительность перехода в секундах | `1` |
 | `--music <папка>` | Папка с музыкой (MP3, M4A, WAV) | Нет |
-| `--first <файлы>` | Фото, которые показать первыми (по порядку) | Нет |
-| `--mode` | Как обрабатывать неквадратные фото: `crop`, `pad`, `blur`, `stretch` | `crop` |
+| `--first <files...>` | Фото, которые показать первыми (по порядку) | None |
+| `--mode <mode>` | Как обрабатывать неквадратные фото: `crop`, `pad`, `blur`, `stretch` | `crop` |
 
 ### Доступные переходы
 
